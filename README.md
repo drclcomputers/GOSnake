@@ -34,12 +34,7 @@ git clone https://github.com/yourusername/go-snake.git
 cd go-snake
 ```
 
-3. Install dependencies:
-```bash
-go mod tidy
-```
-
-4. Build and run:
+3. Build and run:
 ```bash
 go build
 ./gosnake play
@@ -102,6 +97,9 @@ Active Effects: ⚡ Speed Up (5.2s)
 - Go 1.24.2 or later
 - Terminal with ANSI color support
 - Audio output capability (for sound effects)
+
+## 🐛 Known Bugs
+- The snake can sometimes become schizophrenic and see two apples. This effect may or may not disappear after eating one of them. 🍏
 
 ## 📝 License
 
