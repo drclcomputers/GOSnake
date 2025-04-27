@@ -16,9 +16,9 @@ func (g *Game) spawnPowerUp() {
 		return
 	}
 
-	if rand.Float32() < 0.2 {
+	if rand.Float32() < 0.25 {
 		x, y := g.getRandomEmptyPosition()
-		powerType := util.PowerUpType(rand.Intn(5) - 4)
+		powerType := util.PowerUpType(-4 + rand.Intn(5))
 		g.State.Board[x][y] = int(powerType)
 	}
 }

@@ -25,9 +25,9 @@ func (r *Renderer) Render(g *Game) {
 	var builder strings.Builder
 
 	r.renderTopOffset(&builder)
-	r.renderTopAndBottomBorder(&builder)
+	r.renderTopAndBottomBorder(&builder, g.PowerMgr.GhostMode)
 	r.renderBoard(&builder, g)
-	r.renderTopAndBottomBorder(&builder)
+	r.renderTopAndBottomBorder(&builder, g.PowerMgr.GhostMode)
 	r.renderScore(&builder, g.State.Score)
 	if g.State.Config.Mode == util.PowerUps {
 		r.renderActiveEffects(&builder, g)
@@ -37,20 +37,25 @@ func (r *Renderer) Render(g *Game) {
 	fmt.Print(builder.String())
 }
 
-func (r *Renderer) decideColor(builder *strings.Builder) {
+func (r *Renderer) decideColor(builder *strings.Builder, isGhostMode bool) {
+	builder.WriteString(util.BLACK)
+
+	if isGhostMode {
+		builder.WriteString(util.GREEN)
+		return
+	}
+
 	switch r.Config.Mode {
 	case util.NoWalls:
 		builder.WriteString(util.GREEN)
-	case util.Maze, util.Normal:
-		builder.WriteString(util.RED)
 	default:
-		builder.WriteString(util.BLACK)
+		builder.WriteString(util.RED)
 	}
 }
 
 func (r *Renderer) renderBoard(builder *strings.Builder, g *Game) {
 	for x := 0; x < g.State.Config.TermHeight; x++ {
-		r.decideColor(builder)
+		r.decideColor(builder, g.PowerMgr.GhostMode)
 		builder.WriteString(strings.Repeat(" ", g.State.Config.OffsetX-1) + g.State.Config.BorderChar)
 		builder.WriteString(util.BLACK)
 
@@ -65,30 +70,41 @@ func (r *Renderer) renderBoard(builder *strings.Builder, g *Game) {
 			case g.State.Board[x][y] < -1:
 				switch util.PowerUpType(g.State.Board[x][y]) {
 				case util.SpeedUp:
-					builder.WriteString("⚡ ")
+					builder.WriteString("⚡")
 				case util.SlowDown:
-					builder.WriteString("⏳ ")
+					builder.WriteString("⏳")
 				case util.GhostMode:
-					builder.WriteString("👻 ")
+					builder.WriteString("👻")
 				case util.ExtraLength:
-					builder.WriteString("🔄 ")
+					builder.WriteString("🔄")
 				case util.DoublePoints:
-					builder.WriteString("💎 ")
+					builder.WriteString("💎")
 				}
-			case g.State.Board[x][y] == 1:
-				builder.WriteString(g.State.Config.SnakeHead)
-			default:
-				builder.WriteString(g.State.Config.SnakeCell)
+			case g.State.Board[x][y] > 0:
+				for _, powerup := range g.PowerMgr.ActivePowerUps {
+					switch powerup.Type {
+					case util.SpeedUp:
+						builder.WriteString(util.YELLOW)
+					case util.SlowDown:
+						builder.WriteString(util.BLUE)
+					}
+				}
+				if g.State.Board[x][y] == 1 {
+					builder.WriteString(g.State.Config.SnakeHead)
+				} else {
+					builder.WriteString(g.State.Config.SnakeCell)
+				}
+				builder.WriteString(util.BLACK)
 			}
 		}
-		r.decideColor(builder)
+		r.decideColor(builder, g.PowerMgr.GhostMode)
 		builder.WriteString(g.State.Config.BorderChar + "\n")
 		builder.WriteString(util.BLACK)
 	}
 }
 
-func (r *Renderer) renderTopAndBottomBorder(builder *strings.Builder) {
-	r.decideColor(builder)
+func (r *Renderer) renderTopAndBottomBorder(builder *strings.Builder, isGhostMode bool) {
+	r.decideColor(builder, isGhostMode)
 	builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
 	builder.WriteString(strings.Repeat(r.Config.BorderChar, 2*(r.Config.TermWidth+1)))
 	builder.WriteString(util.BLACK)
