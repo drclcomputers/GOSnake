@@ -1,3 +1,8 @@
+// Copyright (c) 2025 @drclcomputers. All rights reserved.
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
+
 package game
 
 import (
@@ -79,7 +84,25 @@ func (g *Game) Welcome() {
 	fmt.Println()
 	fmt.Println("Controls: WASD or Arrow to change direction, 'p' to pause or 'q' to quit.")
 	fmt.Println()
+
+	fmt.Print("Game Mode: ")
+	switch g.config.Mode {
+	case util.Normal:
+		fmt.Println("Normal - Classic snake gameplay with increasing speed")
+	case util.NoWalls:
+		fmt.Println("No Walls - Snake can pass through borders")
+	case util.Maze:
+		fmt.Println("Maze - Navigate through randomly generated obstacles")
+	case util.PowerUps:
+		fmt.Println("Power-ups - Collect special items for unique abilities:")
+		fmt.Println("  ⚡ Speed Up   ⏳ Slow Down   👻 Ghost Mode")
+		fmt.Println("  🔄 Extra Length   💎 Double Points")
+	}
+	if g.relaxedMode {
+		fmt.Println("Relaxed Mode: ON - Speed remains constant")
+	}
 	fmt.Println()
+
 	printHighScores()
 	fmt.Println()
 	fmt.Println("Press any key to start...")
