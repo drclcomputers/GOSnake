@@ -14,11 +14,11 @@ import (
 )
 
 type Renderer struct {
-	config *util.GameConfig
+	Config *util.GameConfig
 }
 
-func NewRenderer(config *util.GameConfig) *Renderer {
-	return &Renderer{config: config}
+func NewRenderer(Config *util.GameConfig) *Renderer {
+	return &Renderer{Config: Config}
 }
 
 func (r *Renderer) Render(g *Game) {
@@ -28,8 +28,8 @@ func (r *Renderer) Render(g *Game) {
 	r.renderTopAndBottomBorder(&builder)
 	r.renderBoard(&builder, g)
 	r.renderTopAndBottomBorder(&builder)
-	r.renderScore(&builder, g.score)
-	if g.config.Mode == util.PowerUps {
+	r.renderScore(&builder, g.State.Score)
+	if g.State.Config.Mode == util.PowerUps {
 		r.renderActiveEffects(&builder, g)
 	}
 
@@ -38,7 +38,7 @@ func (r *Renderer) Render(g *Game) {
 }
 
 func (r *Renderer) decideColor(builder *strings.Builder) {
-	switch r.config.Mode {
+	switch r.Config.Mode {
 	case util.NoWalls:
 		builder.WriteString(util.GREEN)
 	case util.Maze, util.Normal:
@@ -49,73 +49,73 @@ func (r *Renderer) decideColor(builder *strings.Builder) {
 }
 
 func (r *Renderer) renderBoard(builder *strings.Builder, g *Game) {
-	for x := 0; x < g.config.TermHeight; x++ {
+	for x := 0; x < g.State.Config.TermHeight; x++ {
 		r.decideColor(builder)
-		builder.WriteString(strings.Repeat(" ", g.config.OffsetX-1) + g.config.BorderChar)
+		builder.WriteString(strings.Repeat(" ", g.State.Config.OffsetX-1) + g.State.Config.BorderChar)
 		builder.WriteString(util.BLACK)
 
-		for y := 0; y < g.config.TermWidth; y++ {
+		for y := 0; y < g.State.Config.TermWidth; y++ {
 			switch {
-			case g.board[x][y] == 0:
-				builder.WriteString(g.config.EmptyCell)
-			case g.board[x][y] == -1:
-				builder.WriteString(g.config.FoodCell)
-			case g.board[x][y] == 999:
-				builder.WriteString(util.RED + g.config.MazeChar + util.BLACK)
-			case g.board[x][y] < -1:
-				switch PowerUpType(g.board[x][y]) {
-				case SpeedUp:
+			case g.State.Board[x][y] == 0:
+				builder.WriteString(g.State.Config.EmptyCell)
+			case g.State.Board[x][y] == -1:
+				builder.WriteString(g.State.Config.FoodCell)
+			case g.State.Board[x][y] == 999:
+				builder.WriteString(util.RED + g.State.Config.MazeChar + util.BLACK)
+			case g.State.Board[x][y] < -1:
+				switch util.PowerUpType(g.State.Board[x][y]) {
+				case util.SpeedUp:
 					builder.WriteString("⚡ ")
-				case SlowDown:
+				case util.SlowDown:
 					builder.WriteString("⏳ ")
-				case GhostMode:
+				case util.GhostMode:
 					builder.WriteString("👻 ")
-				case ExtraLength:
+				case util.ExtraLength:
 					builder.WriteString("🔄 ")
-				case DoublePoints:
+				case util.DoublePoints:
 					builder.WriteString("💎 ")
 				}
-			case g.board[x][y] == 1:
-				builder.WriteString(g.config.SnakeHead)
+			case g.State.Board[x][y] == 1:
+				builder.WriteString(g.State.Config.SnakeHead)
 			default:
-				builder.WriteString(g.config.SnakeCell)
+				builder.WriteString(g.State.Config.SnakeCell)
 			}
 		}
 		r.decideColor(builder)
-		builder.WriteString(g.config.BorderChar + "\n")
+		builder.WriteString(g.State.Config.BorderChar + "\n")
 		builder.WriteString(util.BLACK)
 	}
 }
 
 func (r *Renderer) renderTopAndBottomBorder(builder *strings.Builder) {
 	r.decideColor(builder)
-	builder.WriteString(strings.Repeat(" ", r.config.OffsetX-1))
-	builder.WriteString(strings.Repeat(r.config.BorderChar, 2*(r.config.TermWidth+1)))
+	builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
+	builder.WriteString(strings.Repeat(r.Config.BorderChar, 2*(r.Config.TermWidth+1)))
 	builder.WriteString(util.BLACK)
 	builder.WriteString("\n")
 }
 
 func (r *Renderer) renderTopOffset(builder *strings.Builder) {
-	for x := 0; x < r.config.OffsetY-2; x++ {
+	for x := 0; x < r.Config.OffsetY-2; x++ {
 		builder.WriteString("\n")
 	}
 }
 
 func (r *Renderer) renderScore(builder *strings.Builder, score int) {
-	builder.WriteString("\n" + strings.Repeat(" ", r.config.OffsetX-1) + "Score: " + strconv.Itoa(score) + "\n")
+	builder.WriteString("\n" + strings.Repeat(" ", r.Config.OffsetX-1) + "Score: " + strconv.Itoa(score) + "\n")
 }
 
 func (r *Renderer) renderActiveEffects(builder *strings.Builder, g *Game) {
-	if len(g.activePowerUps) == 0 {
-		builder.WriteString(strings.Repeat(" ", r.config.OffsetX-1))
-		builder.WriteString("Active Effects: None" + strings.Repeat(" ", g.config.TermWidth))
+	if len(g.PowerMgr.ActivePowerUps) == 0 {
+		builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
+		builder.WriteString("Active Effects: None" + strings.Repeat(" ", g.State.Config.TermWidth))
 		return
 	}
 
-	builder.WriteString(strings.Repeat(" ", r.config.OffsetX-1))
+	builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
 	builder.WriteString("Active Effects: ")
 
-	for _, powerup := range g.activePowerUps {
+	for _, powerup := range g.PowerMgr.ActivePowerUps {
 		remaining := time.Until(powerup.EndTime).Seconds()
 		if remaining <= 0 {
 			continue
@@ -124,19 +124,19 @@ func (r *Renderer) renderActiveEffects(builder *strings.Builder, g *Game) {
 		symbol := ""
 		effect := ""
 		switch powerup.Type {
-		case SpeedUp:
+		case util.SpeedUp:
 			symbol = "⚡"
 			effect = "Speed Up"
-		case SlowDown:
+		case util.SlowDown:
 			symbol = "⏳"
 			effect = "Slow Down"
-		case GhostMode:
+		case util.GhostMode:
 			symbol = "👻"
 			effect = "Ghost Mode"
-		case ExtraLength:
+		case util.ExtraLength:
 			symbol = "🔄"
 			effect = "Extra Length"
-		case DoublePoints:
+		case util.DoublePoints:
 			symbol = "💎"
 			effect = "Double Points"
 		}
@@ -144,6 +144,6 @@ func (r *Renderer) renderActiveEffects(builder *strings.Builder, g *Game) {
 		builder.WriteString(fmt.Sprintf("%s %s (%.1fs) ", symbol, effect, remaining))
 
 	}
-	builder.WriteString(strings.Repeat(" ", g.config.TermWidth-2*g.config.OffsetX))
+	builder.WriteString(strings.Repeat(" ", g.State.Config.TermWidth-2*g.State.Config.OffsetX))
 	builder.WriteString("\n")
 }

@@ -11,77 +11,59 @@ import (
 	"time"
 )
 
-type PowerUpType int
-
-const (
-	SpeedUp PowerUpType = iota - 4
-	SlowDown
-	GhostMode // Pass through walls temporarily
-	ExtraLength
-	DoublePoints
-)
-
-type PowerUp struct {
-	Type     PowerUpType
-	Position util.Position
-	Duration time.Duration
-	Active   bool
-	EndTime  time.Time
-}
-
 func (g *Game) spawnPowerUp() {
-	if g.config.Mode != util.PowerUps {
+	if g.State.Config.Mode != util.PowerUps {
 		return
 	}
 
 	if rand.Float32() < 0.2 {
 		x, y := g.getRandomEmptyPosition()
-		powerType := PowerUpType(rand.Intn(5) - 4)
-		g.board[x][y] = int(powerType)
+		powerType := util.PowerUpType(rand.Intn(5) - 4)
+		g.State.Board[x][y] = int(powerType)
 	}
 }
 
-func (g *Game) activatePowerUp(typ PowerUpType) {
-	powerUp := &PowerUp{
+func (g *Game) activatePowerUp(typ util.PowerUpType) {
+	powerUp := &util.PowerUp{
 		Type:    typ,
 		Active:  true,
 		EndTime: time.Now().Add(10 * time.Second),
 	}
 
 	switch typ {
-	case SpeedUp:
-		g.config.Speed = g.config.Speed / 2
-	case SlowDown:
-		g.config.Speed = g.config.Speed * 2
-	case GhostMode:
-		g.ghostMode = true
-	case ExtraLength:
-		g.snake.Length += 2
-	case DoublePoints:
-		g.pointMultiplier = 2
+	case util.SpeedUp:
+		g.State.Config.Speed = g.State.Config.Speed / 2
+	case util.SlowDown:
+		g.State.Config.Speed = g.State.Config.Speed * 2
+	case util.GhostMode:
+		g.PowerMgr.GhostMode = true
+	case util.ExtraLength:
+		g.State.Snake.Length += 2
+	case util.DoublePoints:
+		g.PowerMgr.PointMultiplier = 2
 	}
 
-	g.activePowerUps = append(g.activePowerUps, powerUp)
+	g.PowerMgr.ActivePowerUps = append(g.PowerMgr.ActivePowerUps, powerUp)
 
-	g.board[g.snake.Headx][g.snake.Heady] = 0
+	g.State.Board[g.State.Snake.Headx][g.State.Snake.Heady] = 0
 }
 
 func (g *Game) updatePowerUps() {
-	for i := len(g.activePowerUps) - 1; i >= 0; i-- {
-		if time.Now().After(g.activePowerUps[i].EndTime) {
-			switch g.activePowerUps[i].Type {
-			case SpeedUp:
-				g.config.Speed *= 2
-			case SlowDown:
-				g.config.Speed /= 2
-			case GhostMode:
-				g.ghostMode = false
-			case ExtraLength:
-				g.snake.Length -= 2
-			case DoublePoints:
-				g.pointMultiplier = 1
+	for i := len(g.PowerMgr.ActivePowerUps) - 1; i >= 0; i-- {
+		if time.Now().After(g.PowerMgr.ActivePowerUps[i].EndTime) {
+			switch g.PowerMgr.ActivePowerUps[i].Type {
+			case util.SpeedUp:
+				g.State.Config.Speed *= 2
+			case util.SlowDown:
+				g.State.Config.Speed /= 2
+			case util.GhostMode:
+				g.PowerMgr.GhostMode = false
+			case util.ExtraLength:
+				g.State.Snake.Length -= 2
+			case util.DoublePoints:
+				g.PowerMgr.PointMultiplier = 1
 			}
-			g.activePowerUps = append(g.activePowerUps[:i], g.activePowerUps[i+1:]...)
+			g.PowerMgr.ActivePowerUps = append(g.PowerMgr.ActivePowerUps[:i], g.PowerMgr.ActivePowerUps[i+1:]...)
 		}
 	}
 }

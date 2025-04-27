@@ -6,10 +6,12 @@
 package util
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"golang.org/x/term"
@@ -106,4 +108,28 @@ func ClearScreen() {
 
 func MoveCursorTo(x, y int) {
 	fmt.Printf("\033[%d;%dH", x, y)
+}
+
+func CheckSpeaker() bool {
+	if runtime.GOOS != "linux" {
+		return true
+	}
+	file, err := os.Open("/proc/asound/cards")
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "[") && strings.Contains(line, "]") {
+			return true
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return false
+	}
+	return false
 }

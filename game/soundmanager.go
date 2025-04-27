@@ -6,10 +6,9 @@
 package game
 
 import (
-	"bufio"
+	"fmt"
+	"gosnake/internal/util"
 	"os"
-	"runtime"
-	"strings"
 	"time"
 
 	"github.com/faiface/beep"
@@ -60,32 +59,9 @@ func (s *SoundManager) ToggleSound() {
 	s.enabled = !s.enabled
 }
 
-func CheckSpeaker() bool {
-	if runtime.GOOS != "linux" {
-		return true
-	}
-	file, err := os.Open("/proc/asound/cards")
-	if err != nil {
-		return false
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "[") && strings.Contains(line, "]") {
-			return true
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return false
-	}
-	return false
-}
-
 func PlayMusic(sound string, times int) {
-	if !CheckSpeaker() {
+	if !util.CheckSpeaker() {
+		fmt.Println("No speaker found. Sound disabled!")
 		return
 	}
 

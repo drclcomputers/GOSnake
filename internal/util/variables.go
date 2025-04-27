@@ -44,6 +44,41 @@ type Position struct {
 	X, Y int
 }
 
+type GameState struct {
+	Config      *GameConfig
+	Snake       *Snake
+	Board       [][]int
+	Score       int
+	ExitGame    bool
+	ExitCode    int
+	PauseGame   bool
+	RelaxedMode bool
+}
+
+type GamePowerMgr struct {
+	GhostMode       bool
+	PointMultiplier int
+	ActivePowerUps  []*PowerUp
+}
+
+type PowerUpType int
+
+const (
+	SpeedUp PowerUpType = iota - 4
+	SlowDown
+	GhostMode // Pass through walls temporarily
+	ExtraLength
+	DoublePoints
+)
+
+type PowerUp struct {
+	Type     PowerUpType
+	Position Position
+	Duration time.Duration
+	Active   bool
+	EndTime  time.Time
+}
+
 const (
 	BLACK   = "\033[0m"
 	RED     = "\033[31m"
@@ -56,3 +91,17 @@ const (
 )
 
 const VER = "v0.6"
+const MODSPEED = 15
+
+const (
+	DirectionUp = iota + 1
+	DirectionRight
+	DirectionDown
+	DirectionLeft
+)
+
+const (
+	CollisionNone = iota
+	CollisionWall
+	CollisionSelf
+)
