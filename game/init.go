@@ -55,15 +55,20 @@ func (g *Game) Welcome() {
 	fmt.Println()
 	fmt.Println("Press any key to start...")
 
-	var in string
-	fmt.Scanln(&in)
+	char, key, _ := keyboard.GetKey()
 
-	if in == "q" {
+	if char == 'q' || char == 'Q' || key == keyboard.KeyEsc {
 		os.Exit(0)
 	}
 }
 
 func (g *Game) Start() {
+    if err := keyboard.Open(); err != nil {
+		fmt.Println("Error initializing keyboard input:", err)
+		return
+	}
+	defer keyboard.Close()
+
 	g.Welcome()
 
 	killSig()
@@ -71,12 +76,6 @@ func (g *Game) Start() {
 	util.ClearScreen()
 	util.HideCursor()
 	defer util.ShowCursor()
-
-	if err := keyboard.Open(); err != nil {
-		fmt.Println("Error initializing keyboard input:", err)
-		return
-	}
-	defer keyboard.Close()
 
 	g.initializeGame()
 	g.runGameLoop()

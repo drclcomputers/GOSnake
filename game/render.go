@@ -29,8 +29,12 @@ func (r *Renderer) Render(g *Game) {
 	r.renderBoard(&builder, g)
 	r.renderTopAndBottomBorder(&builder, g.PowerMgr.GhostMode)
 	r.renderScore(&builder, g.State.Score)
-	if g.State.Config.Mode == util.PowerUps {
+	if g.State.PauseGame {
+		r.renderPauseIndicator(&builder, g)
+	} else if g.State.Config.Mode == util.PowerUps {
 		r.renderActiveEffects(&builder, g)
+	} else {
+		r.renderEmptyLine(&builder, g)
 	}
 
 	util.GoAtTopLeft()
@@ -119,6 +123,19 @@ func (r *Renderer) renderTopOffset(builder *strings.Builder) {
 
 func (r *Renderer) renderScore(builder *strings.Builder, score int) {
 	builder.WriteString("\n" + strings.Repeat(" ", r.Config.OffsetX-1) + "Score: " + strconv.Itoa(score) + "\n")
+}
+
+func (r *Renderer) renderPauseIndicator(builder *strings.Builder, g *Game) {
+	builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
+	builder.WriteString(util.YELLOW + "⏸ PAUSED - Press P to Resume ⏸" + util.BLACK)
+	builder.WriteString(strings.Repeat(" ", g.State.Config.TermWidth-10))
+	builder.WriteString("\n")
+}
+
+func (r *Renderer) renderEmptyLine(builder *strings.Builder, g *Game) {
+	builder.WriteString(strings.Repeat(" ", r.Config.OffsetX-1))
+	builder.WriteString(strings.Repeat(" ", g.State.Config.TermWidth))
+	builder.WriteString("\n")
 }
 
 func (r *Renderer) renderActiveEffects(builder *strings.Builder, g *Game) {

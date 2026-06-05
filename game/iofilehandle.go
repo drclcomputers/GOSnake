@@ -49,6 +49,15 @@ func (g *Game) handleInput(event keyboard.KeyEvent) {
 		g.State.Config.SnakeHead = "()"
 	case event.Rune == 'p' || event.Rune == 'P':
 		g.State.PauseGame = !g.State.PauseGame
+		if g.State.PauseGame {
+			if g.sound != nil {
+				g.sound.PauseMusic()
+			}
+		} else {
+			if g.sound != nil {
+				g.sound.ResumeMusic()
+			}
+		}
 	}
 }
 

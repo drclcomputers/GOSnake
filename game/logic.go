@@ -133,7 +133,7 @@ func (g *Game) update() {
 }
 
 func (g *Game) detectPause() {
-	for g.State.PauseGame {
+	for g.State.PauseGame && !g.State.ExitGame {
 		select {
 		case event := <-g.inputChan:
 			g.handleInput(event)

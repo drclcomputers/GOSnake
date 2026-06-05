@@ -23,6 +23,7 @@ type SoundManager struct {
 
 var musicCtrl *beep.Ctrl
 var musicDone chan bool
+var musicPaused bool
 
 func NewSoundManager(enableSound bool) *SoundManager {
 	return &SoundManager{
@@ -57,6 +58,24 @@ func (s *SoundManager) PlayGameOver() {
 
 func (s *SoundManager) ToggleSound() {
 	s.enabled = !s.enabled
+}
+
+func (s *SoundManager) PauseMusic() {
+	if musicCtrl != nil {
+		speaker.Lock()
+		musicCtrl.Paused = true
+		musicPaused = true
+		speaker.Unlock()
+	}
+}
+
+func (s *SoundManager) ResumeMusic() {
+	if musicCtrl != nil {
+		speaker.Lock()
+		musicCtrl.Paused = false
+		musicPaused = false
+		speaker.Unlock()
+	}
 }
 
 func PlayMusic(sound string, times int) {
