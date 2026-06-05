@@ -90,7 +90,7 @@ const (
 	WHITE   = "\033[37m"
 )
 
-const VER = "v0.6"
+const VER = "v0.7"
 const MODSPEED = 15
 
 const (

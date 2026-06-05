@@ -1,4 +1,5 @@
-# 🐍 GoSnake
+# 🐍 GoSnake 
+### - Reflects ver 0.7 -
 
 A feature-rich terminal-based Snake game written in Go, featuring multiple game modes, power-ups, and sound effects!
 
