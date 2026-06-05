@@ -112,9 +112,8 @@ Contributions are welcome! Feel free to submit issues and pull requests.
 
 ## Acknowledgments
 
-- Built with Go and various awesome Go packages
-- Inspired by the classic Snake game
-- Special thanks to the Go community
+- Built with Go and various Go packages
+- Inspired by the classic Snake game I've played on my Nokia phone 12 years ago
 - Music by [Nicholas Panek](https://pixabay.com/users/nickpanek620-38266323/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=318059) from [Pixabay](https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=318059)
 
 ---
