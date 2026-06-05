@@ -30,7 +30,7 @@ func (g *Game) Welcome() {
 
 	fmt.Println("Welcome to GOSNAKE!")
 	fmt.Println()
-	fmt.Println("Controls: WASD or Arrow to change direction, 'p' to pause or 'q' to quit.")
+	fmt.Println("Controls: WASD/HJKL to move, 'p' to pause, 'q' to quit.")
 	fmt.Println()
 
 	fmt.Print("Game Mode: ")

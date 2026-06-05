@@ -33,20 +33,32 @@ func (g *Game) pollInput() {
 
 func (g *Game) handleInput(event keyboard.KeyEvent) {
 	switch {
-	case event.Key == keyboard.KeyEsc || event.Rune == 'q' || event.Rune == 'Q':
-		g.State.ExitGame = true
-	case (event.Key == keyboard.KeyArrowLeft || event.Rune == 'a') && g.State.Snake.Direction != 2 && !g.State.PauseGame:
+	case event.Rune == 'a' && g.State.Snake.Direction != 2 && !g.State.PauseGame:
 		g.State.Snake.Direction = util.DirectionLeft
 		g.State.Config.SnakeHead = "(:"
-	case (event.Key == keyboard.KeyArrowRight || event.Rune == 'd') && g.State.Snake.Direction != 4 && !g.State.PauseGame:
+	case event.Rune == 'd' && g.State.Snake.Direction != 4 && !g.State.PauseGame:
 		g.State.Snake.Direction = util.DirectionRight
 		g.State.Config.SnakeHead = ":)"
-	case (event.Key == keyboard.KeyArrowDown || event.Rune == 's') && g.State.Snake.Direction != 1 && !g.State.PauseGame:
+	case event.Rune == 's' && g.State.Snake.Direction != 1 && !g.State.PauseGame:
 		g.State.Snake.Direction = util.DirectionDown
 		g.State.Config.SnakeHead = "()"
-	case (event.Key == keyboard.KeyArrowUp || event.Rune == 'w') && g.State.Snake.Direction != 3 && !g.State.PauseGame:
+	case event.Rune == 'w' && g.State.Snake.Direction != 3 && !g.State.PauseGame:
 		g.State.Snake.Direction = util.DirectionUp
 		g.State.Config.SnakeHead = "()"
+
+	case event.Rune == 'h' && g.State.Snake.Direction != 2 && !g.State.PauseGame:
+		g.State.Snake.Direction = util.DirectionLeft
+		g.State.Config.SnakeHead = "(:"
+	case event.Rune == 'l' && g.State.Snake.Direction != 4 && !g.State.PauseGame:
+		g.State.Snake.Direction = util.DirectionRight
+		g.State.Config.SnakeHead = ":)"
+	case event.Rune == 'j' && g.State.Snake.Direction != 1 && !g.State.PauseGame:
+		g.State.Snake.Direction = util.DirectionDown
+		g.State.Config.SnakeHead = "()"
+	case event.Rune == 'k' && g.State.Snake.Direction != 3 && !g.State.PauseGame:
+		g.State.Snake.Direction = util.DirectionUp
+		g.State.Config.SnakeHead = "()"
+
 	case event.Rune == 'p' || event.Rune == 'P':
 		g.State.PauseGame = !g.State.PauseGame
 		if g.State.PauseGame {
@@ -58,6 +70,9 @@ func (g *Game) handleInput(event keyboard.KeyEvent) {
 				g.sound.ResumeMusic()
 			}
 		}
+
+	case event.Key == keyboard.KeyEsc || event.Rune == 'q' || event.Rune == 'Q':
+		g.State.ExitGame = true
 	}
 }
 
